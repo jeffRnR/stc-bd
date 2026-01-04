@@ -18,7 +18,7 @@ export default function Home() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState<Array<{id: number, left: number, delay: number, emoji: string}>>([]);
   const [confetti, setConfetti] = useState<Array<{id: number, left: number, delay: number, color: string}>>([]);
-  const [showHints, setShowHints] = useState(false);
+  // const [showHints, setShowHints] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const [birthdayCakeClicks, setBirthdayCakeClicks] = useState(0);
@@ -370,24 +370,19 @@ const downloadCard = async () => {
       )}
 
       {/* Hidden Easter Egg - Click the heart */}
-      {/* 1. The Trigger Icon (Bottom Left Heart) */}
       {step >= 4 && (
         <div 
           onClick={checkEasterEgg}
-          className="fixed bottom-6 left-6 z-40 cursor-pointer hover:scale-125 transition-transform duration-300"
+          className="fixed bottom-10 left-10 z-40 cursor-pointer hover:scale-125 transition-transform duration-300"
         >
-          <div className="relative">
-            <Heart 
-              size={32} 
-              className={easterEggFound ? 'text-red-500 fill-red-500 animate-pulse' : 'text-pink-300/60'} 
-            />
-            {!easterEggFound && (
-               <span className="absolute -top-1 -right-1 flex h-3 w-3">
-                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
-                 <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
-               </span>
-            )}
-          </div>
+          <Heart 
+            size={32} 
+            // This makes the heart faint (30% opacity) so it stays a secret 
+            // until she finds it, then it turns bright red.
+            className={easterEggFound 
+              ? 'text-red-500 fill-red-500 animate-pulse' 
+              : 'text-pink-300/30 hover:text-pink-400 transition-colors'} 
+          />
         </div>
       )}
 
