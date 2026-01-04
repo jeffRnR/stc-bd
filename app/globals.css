@@ -1,0 +1,206 @@
+@import "tailwindcss";
+
+@layer utilities {
+
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;  /* IE and Edge */
+    scrollbar-width: none;  /* Firefox */
+  }
+  /* Cute Floating Hearts Animation */
+  @keyframes float-up {
+    0% {
+      transform: translateY(0) scale(1) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100vh) scale(0.5) rotate(20deg);
+      opacity: 0;
+    }
+  }
+
+  /* Birthday Confetti */
+  @keyframes confetti {
+    0% {
+      transform: translateY(0) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(100vh) rotate(720deg);
+      opacity: 0;
+    }
+  }
+
+  /* Smooth Entrance */
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+
+  /* Left-to-Right Slide for Compliments */
+  @keyframes slide-in {
+    from {
+      opacity: 0;
+      transform: translateX(-30px);
+      filter: blur(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+      filter: blur(0);
+    }
+  }
+
+  @keyframes bounceThree {
+    0%,
+    100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-20px);
+    }
+  }
+
+  /* Custom Classes */
+  .animate-float-up {
+    animation: float-up 4s ease-in forwards;
+  }
+  .animate-confetti {
+    animation: confetti 7s ease-out forwards;
+  }
+  .animate-fade-in {
+    animation: fade-in 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .animate-slide-in {
+    animation: slide-in 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+    animation-fill-mode: both;
+  }
+  .animate-bounce-three {
+    animation: bounceThree 0.6s ease-in-out 3;
+  }
+
+  /* Premium Lady-like Scrollbar */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background: linear-gradient(
+      180deg,
+      rgba(236, 72, 153, 0.4),
+      rgba(168, 85, 247, 0.4)
+    );
+    border-radius: 10px;
+    border: 2px solid transparent;
+    background-clip: padding-box;
+  }
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(
+      180deg,
+      rgba(236, 72, 153, 0.6),
+      rgba(168, 85, 247, 0.6)
+    );
+    background-clip: padding-box;
+  }
+
+  /* Enhanced Glassmorphism */
+  .glass-premium {
+    background: rgba(255, 255, 255, 0.12);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.15);
+  }
+
+  .glass-light {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(16px) saturate(180%);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.1);
+  }
+
+  /* Soft Glow for Dark Mode Text */
+  .text-glow-pink {
+    text-shadow: 0 0 20px rgba(249, 168, 212, 0.3),
+      0 0 40px rgba(249, 168, 212, 0.2);
+  }
+
+  .text-glow-purple {
+    text-shadow: 0 0 20px rgba(216, 180, 254, 0.3),
+      0 0 40px rgba(216, 180, 254, 0.2);
+  }
+
+  /* Premium Button Hover Effect */
+  .btn-premium-hover {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-premium-hover::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transition: left 0.5s;
+  }
+
+  .btn-premium-hover:hover::before {
+    left: 100%;
+  }
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
+    sans-serif;
+}
+
+/* Enhanced Glassmorphism background blur */
+.backdrop-blur-md {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+}
+
+.backdrop-blur-sm {
+  backdrop-filter: blur(12px) saturate(180%);
+  -webkit-backdrop-filter: blur(12px) saturate(180%);
+}
+
+/* Soft box shadows for depth */
+.shadow-premium {
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.shadow-premium-lg {
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15), 0 4px 16px rgba(0, 0, 0, 0.1);
+}
+
+/* Smooth transitions */
+* {
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
