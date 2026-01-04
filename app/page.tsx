@@ -23,6 +23,7 @@ export default function Home() {
   const cardRef = useRef<HTMLDivElement>(null);
   const [touchSequence, setTouchSequence] = useState<string[]>([]);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
+  const [trail, setTrail] = useState<{ x: number; y: number; id: number }[]>([]);
 
   const photos = [
   { url: '/memories/stc2.jpeg', caption: 'Beautiful soul 🌸' },
@@ -42,6 +43,16 @@ const handleSecretAreaClick = (area: string) => {
       setTouchSequence([]); // Reset
     }
   };
+
+  const handlePointerMove = (e: React.PointerEvent | React.MouseEvent) => {
+  const newPoint = { x: e.clientX, y: e.clientY, id: Date.now() };
+  setTrail((prev) => [...prev.slice(-20), newPoint]); // Keeps the trail short
+
+  // Fades individual points out after 500ms
+  setTimeout(() => {
+    setTrail((prev) => prev.filter((p) => p.id !== newPoint.id));
+  }, 500);
+};
 
 const downloadCard = async () => {
   if (cardRef.current) {
@@ -234,51 +245,29 @@ const downloadCard = async () => {
 
   return (
     <div className={`h-screen w-full ${bgClass} transition-all duration-1000 relative overflow-hidden flex flex-col`}>
-      <div className="absolute inset-0 pointer-events-none z-10">
-      {/* Top Left Zone */}
+      {/* Secret Touch Targets */}
+      <div className="absolute inset-0 pointer-events-none z-50">
         <div 
-          className="absolute top-0 left-0 w-32 h-32 pointer-events-auto cursor-pointer" 
-          onClick={() => handleSecretAreaClick('TL')} 
+          className="absolute top-[18%] left-[20%] w-44 h-44 pointer-events-auto cursor-default rounded-full" 
+          onPointerDown={() => handleSecretAreaClick('TL')} 
         />
-        {/* Top Right Zone */}
         <div 
-          className="absolute top-0 right-0 w-32 h-32 pointer-events-auto cursor-pointer" 
-          onClick={() => handleSecretAreaClick('TR')} 
+          className="absolute top-[18%] right-[20%] w-44 h-44 pointer-events-auto cursor-default rounded-full" 
+          onPointerDown={() => handleSecretAreaClick('TR')} 
         />
-        {/* Bottom Center Zone */}
         <div 
-          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-auto cursor-pointer" 
-          onClick={() => handleSecretAreaClick('BC')} 
+          className="absolute bottom-[25%] left-1/2 -translate-x-1/2 w-44 h-44 pointer-events-auto cursor-default rounded-full" 
+          onPointerDown={() => handleSecretAreaClick('BC')} 
         />
       </div>
 
-      {/* Hint Dots - Only show when hints are enabled */}
-      {showHints && (
-        <>
-          {/* Top Left Dot */}
-          <div className="absolute top-8 left-8 z-20 pointer-events-none">
-            <div className="relative">
-              <div className="w-4 h-4 bg-pink-400 rounded-full animate-pulse"></div>
-              <div className="absolute inset-0 w-4 h-4 bg-pink-400 rounded-full animate-ping"></div>
-            </div>
-          </div>
-          
-          {/* Top Right Dot */}
-          <div className="absolute top-8 right-8 z-20 pointer-events-none">
-            <div className="relative">
-              <div className="w-4 h-4 bg-pink-400 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
-              <div className="absolute inset-0 w-4 h-4 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
-            </div>
-          </div>
-          
-          {/* Bottom Center Dot */}
-          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
-            <div className="relative">
-              <div className="w-4 h-4 bg-pink-400 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }}></div>
-              <div className="absolute inset-0 w-4 h-4 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '0.6s' }}></div>
-            </div>
-          </div>
-        </>
+      {/* The 'Sparkle' Hint logic - Tied to step 2 and the hint button */}
+      {showHints && step === 2 && (
+        <div className="absolute inset-0 pointer-events-none z-[60]">
+          <Sparkles className="absolute top-[18%] left-[20%] -translate-x-1/2 -translate-y-1/2 text-pink-400 animate-pulse" size={40} />
+          <Sparkles className="absolute top-[18%] right-[20%] translate-x-1/2 -translate-y-1/2 text-pink-400 animate-pulse" size={40} style={{ animationDelay: '0.2s' }} />
+          <Sparkles className="absolute bottom-[25%] left-1/2 -translate-x-1/2 translate-y-1/2 text-pink-400 animate-pulse" size={40} style={{ animationDelay: '0.4s' }} />
+        </div>
       )}
 
       {/* Floating Hearts */}
@@ -509,7 +498,7 @@ const downloadCard = async () => {
                 Hey Stacy 💕
               </h1>
               <p className={`text-xl ${darkMode ? 'text-purple-100' : 'text-gray-700'} mb-8`}>
-                You are loved on this side... explore something special made just for you! (because you are special 😊)
+                You are loved on this side... this is specially made just for you!😊
               </p>
               <button
                 onClick={() => setStep(1)}
@@ -629,7 +618,7 @@ const downloadCard = async () => {
                 onClick={() => setStep(4)}
                 className="px-8 py-4 bg-gradient-to-r from-pink-500 to-rose-500 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform animate-pulse"
               >
-                Show me! 🎁✨
+                Show me more! ✨
               </button>
             </div>
           )}
