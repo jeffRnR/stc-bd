@@ -21,9 +21,8 @@ export default function Home() {
   const [showHints, setShowHints] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const cardRef = useRef<HTMLDivElement>(null);
-  const [touchSequence, setTouchSequence] = useState<string[]>([]);
+  const [birthdayCakeClicks, setBirthdayCakeClicks] = useState(0);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
-  const [trail, setTrail] = useState<{ x: number; y: number; id: number }[]>([]);
 
   const photos = [
   { url: '/memories/stc2.jpeg', caption: 'Beautiful soul 🌸' },
@@ -32,27 +31,17 @@ export default function Home() {
   { url: '/memories/stc3.jpeg', caption: 'Cherished always 💝' }
 ];
 
-const handleSecretAreaClick = (area: string) => {
-    const newSequence = [...touchSequence, area].slice(-3);
-    setTouchSequence(newSequence);
+const handleBirthdayCakeClick = () => {
+    const newClicks = birthdayCakeClicks + 1;
+    setBirthdayCakeClicks(newClicks);
     
-    // The secret "Heart" sequence: Top Left -> Top Right -> Bottom Center
-    if (newSequence.join(',') === 'TL,TR,BC') {
+    // Unlock after 7 clicks on the birthday cake emoji
+    if (newClicks === 7) {
       setKonamiUnlocked(true);
       triggerFireworks();
-      setTouchSequence([]); // Reset
+      setBirthdayCakeClicks(0); // Reset
     }
   };
-
-  const handlePointerMove = (e: React.PointerEvent | React.MouseEvent) => {
-  const newPoint = { x: e.clientX, y: e.clientY, id: Date.now() };
-  setTrail((prev) => [...prev.slice(-20), newPoint]); // Keeps the trail short
-
-  // Fades individual points out after 500ms
-  setTimeout(() => {
-    setTrail((prev) => prev.filter((p) => p.id !== newPoint.id));
-  }, 500);
-};
 
 const downloadCard = async () => {
   if (cardRef.current) {
@@ -122,13 +111,37 @@ const downloadCard = async () => {
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      alert('💕 To install this birthday card:\n\nTap Menu (⋮) → Install App');
+      // Provide helpful instructions for different browsers
+      const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent);
+      const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+      
+      if (isIOS && isSafari) {
+        alert('💕 To install this birthday card on iOS:\n\n1. Tap the Share button (square with arrow)\n2. Scroll down and tap "Add to Home Screen"\n3. Tap "Add" in the top right');
+      } else if (isIOS) {
+        alert('💕 To install this birthday card:\n\nPlease open this page in Safari, then:\n1. Tap the Share button\n2. Tap "Add to Home Screen"');
+      } else {
+        alert('💕 To install this birthday card:\n\n1. Tap the menu (⋮ or ⋯)\n2. Tap "Install app" or "Add to Home Screen"\n3. Confirm the installation');
+      }
       return;
     }
-    deferredPrompt.prompt();
-    const { outcome } = await deferredPrompt.userChoice;
-    if (outcome === 'accepted') setShowInstallPrompt(false);
-    setDeferredPrompt(null);
+    
+    try {
+      await deferredPrompt.prompt();
+      const { outcome } = await deferredPrompt.userChoice;
+      
+      if (outcome === 'accepted') {
+        setShowInstallPrompt(false);
+        // Show success message
+        setTimeout(() => {
+          alert('🎉 Birthday card installed! You can now access it from your home screen! 💕');
+        }, 500);
+      }
+      
+      setDeferredPrompt(null);
+    } catch (error) {
+      console.error('Install error:', error);
+      alert('💕 Having trouble installing? Try using your browser\'s menu to add this page to your home screen!');
+    }
   };
 
   // Music control with better error handling
@@ -245,31 +258,6 @@ const downloadCard = async () => {
 
   return (
     <div className={`h-screen w-full ${bgClass} transition-all duration-1000 relative overflow-hidden flex flex-col`}>
-      {/* Secret Touch Targets */}
-      <div className="absolute inset-0 pointer-events-none z-50">
-        <div 
-          className="absolute top-[18%] left-[20%] w-44 h-44 pointer-events-auto cursor-default rounded-full" 
-          onPointerDown={() => handleSecretAreaClick('TL')} 
-        />
-        <div 
-          className="absolute top-[18%] right-[20%] w-44 h-44 pointer-events-auto cursor-default rounded-full" 
-          onPointerDown={() => handleSecretAreaClick('TR')} 
-        />
-        <div 
-          className="absolute bottom-[25%] left-1/2 -translate-x-1/2 w-44 h-44 pointer-events-auto cursor-default rounded-full" 
-          onPointerDown={() => handleSecretAreaClick('BC')} 
-        />
-      </div>
-
-      {/* The 'Sparkle' Hint logic - Tied to step 2 and the hint button */}
-      {showHints && step === 2 && (
-        <div className="absolute inset-0 pointer-events-none z-[60]">
-          <Sparkles className="absolute top-[18%] left-[20%] -translate-x-1/2 -translate-y-1/2 text-pink-400 animate-pulse" size={40} />
-          <Sparkles className="absolute top-[18%] right-[20%] translate-x-1/2 -translate-y-1/2 text-pink-400 animate-pulse" size={40} style={{ animationDelay: '0.2s' }} />
-          <Sparkles className="absolute bottom-[25%] left-1/2 -translate-x-1/2 translate-y-1/2 text-pink-400 animate-pulse" size={40} style={{ animationDelay: '0.4s' }} />
-        </div>
-      )}
-
       {/* Floating Hearts */}
       {floatingHearts.map(heart => (
         <div
@@ -344,17 +332,6 @@ const downloadCard = async () => {
           >
             <Moon size={20} className={darkMode ? 'text-purple-300' : 'text-gray-400'} />
           </button>
-
-          {/* Hint Toggle Button */}
-          {step === 2 && (
-            <button
-              onClick={() => setShowHints(!showHints)}
-              className={`p-3 ${darkMode ? 'bg-white/10 backdrop-blur-md border border-white/20' : 'bg-white/90 backdrop-blur-md'} rounded-2xl shadow-lg hover:scale-110 transition ${showHints ? 'ring-2 ring-pink-400' : ''}`}
-              aria-label="Toggle hints"
-            >
-              <Sparkles size={20} className={showHints ? 'text-pink-400 animate-pulse' : darkMode ? 'text-gray-300' : 'text-gray-400'} />
-            </button>
-          )}
       </div>
 
       {/* Back Button */}
@@ -422,7 +399,7 @@ const downloadCard = async () => {
               <div className="bg-pink-100 dark:bg-pink-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                 <Heart className="text-pink-500 fill-pink-500" size={32} />
               </div>
-              <h3 className="text-xl font-bold text-pink-600 dark:text-pink-400 mb-4">A Secret for You...</h3>
+              <h3 className="text-xl font-bold text-pink-600 dark:text-pink-400 mb-4">A Side note ...</h3>
               <p className={`text-lg leading-relaxed italic ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
                 "Stacy, Pass my regards to your big heart and explicitly mention that 
                 I will never wish not to be in it. 💕"
@@ -450,7 +427,7 @@ const downloadCard = async () => {
             <div className="text-center relative z-10">
               <PartyPopper className="mx-auto text-purple-500 mb-4 animate-bounce" size={56} />
               <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
-                Ultimate Secret Unlocked!
+                Birthday Wish...!
               </h3>
               <div className="space-y-4">
                 <p className={`text-base leading-relaxed font-medium ${darkMode ? 'text-purple-100' : 'text-gray-800'}`}>
@@ -465,20 +442,27 @@ const downloadCard = async () => {
                 onClick={() => setKonamiUnlocked(false)}
                 className="mt-8 w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition"
               >
-                Close with Love 💕
+                Close 
               </button>
             </div>
           </div>
         </div>
       )}
 
-      {/* Hidden Easter Egg - Click cake icon */}
+      {/* Hidden Easter Egg - Click cake icon 7 times */}
       {step >= 2 && (
         <div 
-          onClick={handleNameClick}
-          className="absolute top-4 left-1/2 transform -translate-x-1/2 cursor-pointer hover:scale-110 transition"
+          onClick={handleBirthdayCakeClick}
+          className="absolute top-4 left-1/2 transform -translate-x-1/2 cursor-pointer hover:scale-110 transition z-[70]"
         >
-          <Cake size={20} className={secretClicks > 0 ? 'text-pink-500 animate-fade-in' : 'text-pink-300/50'} />
+          <div className="relative">
+            <Cake size={24} className={birthdayCakeClicks > 0 ? 'text-pink-500 animate-bounce' : 'text-pink-300/50'} />
+            {birthdayCakeClicks > 0 && birthdayCakeClicks < 7 && (
+              <span className="absolute -top-2 -right-2 bg-pink-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center font-bold">
+                {birthdayCakeClicks}
+              </span>
+            )}
+          </div>
         </div>
       )}
 
@@ -498,7 +482,7 @@ const downloadCard = async () => {
                 Hey Stacy 💕
               </h1>
               <p className={`text-xl ${darkMode ? 'text-purple-100' : 'text-gray-700'} mb-8`}>
-                You are loved on this side... this is specially made just for you!😊
+                You are loved on this side... explore something special made just for you! (because you are special 😊)
               </p>
               <button
                 onClick={() => setStep(1)}
@@ -567,11 +551,10 @@ const downloadCard = async () => {
                 Ready? 🎂
               </button>
               <p className={`mt-6 text-xs ${darkMode ? 'text-purple-200' : 'text-gray-500'} italic`}>
-                Hint: Draw a secret heart pattern... Click the sparkle button to reveal hints! ✨
+                Hint: Try clicking the birthday cake 🎂 at the top... 7 times! 🎉
               </p>
             </div>
           )}
-          
           {/* Step 3: Photo memories */}
           {step === 3 && (
             <div className="text-center animate-fade-in">
@@ -652,7 +635,7 @@ const downloadCard = async () => {
                 onClick={() => setStep(0)}
                 className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform flex items-center gap-2 mx-auto mb-4"
               >
-                Start Over 🔄
+                Start Over 
               </button>
 
               <p className={`mt-4 text-sm ${darkMode ? 'text-purple-200' : 'text-gray-600'}`}>
