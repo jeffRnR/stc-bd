@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import { Heart, Sparkles, Star, Music, Moon, Send, Camera, ArrowLeft, Gift, Cake, PartyPopper } from 'lucide-react';
+import html2canvas from 'html2canvas';
 
 export default function Home() {
   const [step, setStep] = useState(0);
@@ -17,7 +18,10 @@ export default function Home() {
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [floatingHearts, setFloatingHearts] = useState<Array<{id: number, left: number, delay: number, emoji: string}>>([]);
   const [confetti, setConfetti] = useState<Array<{id: number, left: number, delay: number, color: string}>>([]);
+  const [showHints, setShowHints] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [touchSequence, setTouchSequence] = useState<string[]>([]);
   const [deferredPrompt, setDeferredPrompt] = useState<any>(null);
 
   const photos = [
@@ -26,6 +30,31 @@ export default function Home() {
   { url: '/memories/stc4.jpeg', caption: 'Magical you ✨' },
   { url: '/memories/stc3.jpeg', caption: 'Cherished always 💝' }
 ];
+
+const handleSecretAreaClick = (area: string) => {
+    const newSequence = [...touchSequence, area].slice(-3);
+    setTouchSequence(newSequence);
+    
+    // The secret "Heart" sequence: Top Left -> Top Right -> Bottom Center
+    if (newSequence.join(',') === 'TL,TR,BC') {
+      setKonamiUnlocked(true);
+      triggerFireworks();
+      setTouchSequence([]); // Reset
+    }
+  };
+
+const downloadCard = async () => {
+  if (cardRef.current) {
+    const canvas = await html2canvas(cardRef.current, {
+      backgroundColor: darkMode ? '#1e1b4b' : '#fff5f7',
+      scale: 2 // Makes the image crisp
+    });
+    const link = document.createElement('a');
+    link.download = 'Stacys-Birthday-Card.png';
+    link.href = canvas.toDataURL();
+    link.click();
+  }
+};
 
   const compliments = [
     "💕 Have the best birthday today and remember you light up every room you walk in. You are a queen by design, hold that crown high love💕",
@@ -76,24 +105,18 @@ export default function Home() {
       setDeferredPrompt(e);
       setShowInstallPrompt(true);
     };
-
     window.addEventListener('beforeinstallprompt', handler);
     return () => window.removeEventListener('beforeinstallprompt', handler);
   }, []);
 
   const handleInstallClick = async () => {
     if (!deferredPrompt) {
-      // Show a helpful message if PWA can't be installed
-      alert('💕 To install this birthday card:\n\nTap Menu (⋮) → Install App\n\n💻 On Desktop:\n• Chrome: Click the install icon in address bar\n• Or use browser menu → Install\n\n');
+      alert('💕 To install this birthday card:\n\nTap Menu (⋮) → Install App');
       return;
     }
-    
     deferredPrompt.prompt();
     const { outcome } = await deferredPrompt.userChoice;
-    
-    if (outcome === 'accepted') {
-      setShowInstallPrompt(false);
-    }
+    if (outcome === 'accepted') setShowInstallPrompt(false);
     setDeferredPrompt(null);
   };
 
@@ -211,6 +234,53 @@ export default function Home() {
 
   return (
     <div className={`h-screen w-full ${bgClass} transition-all duration-1000 relative overflow-hidden flex flex-col`}>
+      <div className="absolute inset-0 pointer-events-none z-10">
+      {/* Top Left Zone */}
+        <div 
+          className="absolute top-0 left-0 w-32 h-32 pointer-events-auto cursor-pointer" 
+          onClick={() => handleSecretAreaClick('TL')} 
+        />
+        {/* Top Right Zone */}
+        <div 
+          className="absolute top-0 right-0 w-32 h-32 pointer-events-auto cursor-pointer" 
+          onClick={() => handleSecretAreaClick('TR')} 
+        />
+        {/* Bottom Center Zone */}
+        <div 
+          className="absolute bottom-0 left-1/2 -translate-x-1/2 w-32 h-32 pointer-events-auto cursor-pointer" 
+          onClick={() => handleSecretAreaClick('BC')} 
+        />
+      </div>
+
+      {/* Hint Dots - Only show when hints are enabled */}
+      {showHints && (
+        <>
+          {/* Top Left Dot */}
+          <div className="absolute top-8 left-8 z-20 pointer-events-none">
+            <div className="relative">
+              <div className="w-4 h-4 bg-pink-400 rounded-full animate-pulse"></div>
+              <div className="absolute inset-0 w-4 h-4 bg-pink-400 rounded-full animate-ping"></div>
+            </div>
+          </div>
+          
+          {/* Top Right Dot */}
+          <div className="absolute top-8 right-8 z-20 pointer-events-none">
+            <div className="relative">
+              <div className="w-4 h-4 bg-pink-400 rounded-full animate-pulse" style={{ animationDelay: '0.3s' }}></div>
+              <div className="absolute inset-0 w-4 h-4 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '0.3s' }}></div>
+            </div>
+          </div>
+          
+          {/* Bottom Center Dot */}
+          <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 pointer-events-none">
+            <div className="relative">
+              <div className="w-4 h-4 bg-pink-400 rounded-full animate-pulse" style={{ animationDelay: '0.6s' }}></div>
+              <div className="absolute inset-0 w-4 h-4 bg-pink-400 rounded-full animate-ping" style={{ animationDelay: '0.6s' }}></div>
+            </div>
+          </div>
+        </>
+      )}
+
       {/* Floating Hearts */}
       {floatingHearts.map(heart => (
         <div
@@ -251,7 +321,7 @@ export default function Home() {
             <Star
               key={i}
               className="absolute text-yellow-200 animate-pulse"
-              size={8 + Math.random() * 8}
+              size={3 + Math.random() * 3}
               style={{
                 top: `${Math.random() * 100}%`,
                 left: `${Math.random() * 100}%`,
@@ -263,8 +333,7 @@ export default function Home() {
       )}
 
       {/* Controls */}
-      {/* Controls - Updated to sticky */}
-      <div className="sticky top-0 right-0 flex justify-end gap-2 p-4 z-50 cursor-pointer">
+      <div className="sticky top-0 right-0 flex justify-end gap-2 p-4 z-[70] cursor-pointer">
           <button
             onClick={handleInstallClick}
             className={`p-3 ${darkMode ? 'bg-white/10 backdrop-blur-md border border-white/20' : 'bg-white/90 backdrop-blur-md'} rounded-2xl shadow-lg hover:scale-110 transition`}
@@ -286,13 +355,24 @@ export default function Home() {
           >
             <Moon size={20} className={darkMode ? 'text-purple-300' : 'text-gray-400'} />
           </button>
+
+          {/* Hint Toggle Button */}
+          {step === 2 && (
+            <button
+              onClick={() => setShowHints(!showHints)}
+              className={`p-3 ${darkMode ? 'bg-white/10 backdrop-blur-md border border-white/20' : 'bg-white/90 backdrop-blur-md'} rounded-2xl shadow-lg hover:scale-110 transition ${showHints ? 'ring-2 ring-pink-400' : ''}`}
+              aria-label="Toggle hints"
+            >
+              <Sparkles size={20} className={showHints ? 'text-pink-400 animate-pulse' : darkMode ? 'text-gray-300' : 'text-gray-400'} />
+            </button>
+          )}
       </div>
 
       {/* Back Button */}
       {step > 0 && step < 4 && (
         <button
           onClick={goBack}
-          className={`absolute top-4 left-4 p-3 ${darkMode ? 'bg-white/10 backdrop-blur-md border border-white/20' : 'bg-white/90 backdrop-blur-md'} rounded-2xl shadow-lg hover:scale-110 transition z-50 flex items-center gap-2`}
+          className={`absolute top-4 left-4 p-3 ${darkMode ? 'bg-white/10 backdrop-blur-md border border-white/20' : 'bg-white/90 backdrop-blur-md'} rounded-2xl shadow-lg hover:scale-110 transition z-[70] flex items-center gap-2`}
         >
           <ArrowLeft size={20} className={darkMode ? 'text-pink-300' : 'text-pink-500'} />
         </button>
@@ -324,56 +404,81 @@ export default function Home() {
       )}
 
       {/* Hidden Easter Egg - Click the heart */}
+      {/* 1. The Trigger Icon (Bottom Left Heart) */}
       {step >= 4 && (
         <div 
           onClick={checkEasterEgg}
-          className="absolute bottom-4 left-4 cursor-pointer hover:scale-110 transition"
+          className="fixed bottom-6 left-6 z-40 cursor-pointer hover:scale-125 transition-transform duration-300"
         >
-          <Heart size={24} className={easterEggFound ? 'text-red-500 fill-red-500 animate-pulse' : 'text-pink-300'} />
-        </div>
-      )}
-
-      {/* Easter Egg Modal */}
-      {easterEggFound && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30 backdrop-blur-sm p-4">
-          <div className="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-2xl animate-fade-in max-w-sm">
-            <p className="text-center text-lg text-pink-600 mb-4">
-              🎉 Easter Egg! 🎉<br/>
-              {/* <span className="text-sm block mt-2">You found the hidden message!</span> */}
-              <span className="text-base block mt-4 font-semibold"> "Stacy, Pass my regards to your big heart and explicilty mention that 
-                I will never wish not to be in it. 💕"</span>
-            </p>
-            <button 
-              onClick={() => setEasterEggFound(false)}
-              className="mt-4 w-full bg-gradient-to-r from-pink-400 to-rose-400 text-white py-3 rounded-full hover:scale-105 transition"
-            >
-              Close 💕
-            </button>
+          <div className="relative">
+            <Heart 
+              size={32} 
+              className={easterEggFound ? 'text-red-500 fill-red-500 animate-pulse' : 'text-pink-300/60'} 
+            />
+            {!easterEggFound && (
+               <span className="absolute -top-1 -right-1 flex h-3 w-3">
+                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+                 <span className="relative inline-flex rounded-full h-3 w-3 bg-pink-500"></span>
+               </span>
+            )}
           </div>
         </div>
       )}
 
-      {/* Konami Code Easter Egg */}
-      {konamiUnlocked && (
-        <div className="fixed inset-0 flex items-center justify-center z-50 bg-black/30 backdrop-blur-sm p-4">
-          <div className="bg-white/95 backdrop-blur-sm p-8 rounded-3xl shadow-2xl max-w-sm animate-fade-in">
-            <div className="text-center mb-4">
-              <PartyPopper className="mx-auto text-pink-500 mb-2" size={48} />
-              <p className="text-2xl font-bold text-pink-600 mb-2">🎉 Easter Egg! 🎉</p>
-              {/* <p className="text-lg text-gray-700 mb-4">
-                You unlocked the ultimate easter egg!
-              </p> */}
-              <p className="text-sm text-gray-600 italic">
-                "You have constantly showed me what a life partner should look like
-                and you are the life partner I wish for. May your birthday give us the gift of a healthy relationship💝"
+      {/* 2. Standard Secret Message Modal (The Heart Trigger) */}
+      {easterEggFound && (
+        <div className="fixed inset-0 flex items-center justify-center z-[100] bg-black/40 backdrop-blur-md p-6 animate-fade-in">
+          <div className={`${darkMode ? 'bg-gray-900 border border-pink-500/30' : 'bg-white'} p-8 rounded-[2.5rem] shadow-2xl max-w-sm w-full transform transition-all`}>
+            <div className="text-center">
+              <div className="bg-pink-100 dark:bg-pink-900/30 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Heart className="text-pink-500 fill-pink-500" size={32} />
+              </div>
+              <h3 className="text-xl font-bold text-pink-600 dark:text-pink-400 mb-4">A Secret for You...</h3>
+              <p className={`text-lg leading-relaxed italic ${darkMode ? 'text-gray-200' : 'text-gray-700'}`}>
+                "Stacy, Pass my regards to your big heart and explicitly mention that 
+                I will never wish not to be in it. 💕"
               </p>
+              <button 
+                onClick={() => setEasterEggFound(false)}
+                className="mt-8 w-full bg-gradient-to-r from-pink-400 to-rose-500 text-white py-4 rounded-2xl font-bold shadow-lg active:scale-95 transition"
+              >
+                Keep it safe 💕
+              </button>
             </div>
-            <button 
-              onClick={() => setKonamiUnlocked(false)}
-              className="mt-4 w-full bg-gradient-to-r from-purple-400 to-pink-400 text-white py-3 rounded-full hover:scale-105 transition"
-            >
-              Close 💕
-            </button>
+          </div>
+        </div>
+      )}
+
+      {/* 3. Ultimate Secret Message Modal (The Touch Sequence Trigger) */}
+      {konamiUnlocked && (
+        <div className="fixed inset-0 flex items-center justify-center z-[100] bg-black/60 backdrop-blur-lg p-6 animate-fade-in">
+          <div className={`${darkMode ? 'bg-indigo-950 border border-purple-400/30' : 'bg-white'} p-8 rounded-[2.5rem] shadow-2xl max-w-sm w-full relative overflow-hidden`}>
+            {/* Decorative background sparkle */}
+            <div className="absolute top-0 right-0 p-4 opacity-20">
+              <Sparkles size={100} className="text-purple-400" />
+            </div>
+
+            <div className="text-center relative z-10">
+              <PartyPopper className="mx-auto text-purple-500 mb-4 animate-bounce" size={56} />
+              <h3 className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-purple-500 to-pink-500 mb-4">
+                Ultimate Secret Unlocked!
+              </h3>
+              <div className="space-y-4">
+                <p className={`text-base leading-relaxed font-medium ${darkMode ? 'text-purple-100' : 'text-gray-800'}`}>
+                  "You have constantly showed me what a life partner should look like
+                  and you are the life partner I wish for."
+                </p>
+                <p className="text-pink-500 font-bold text-lg">
+                  May your birthday give us the gift of a healthy relationship 💝
+                </p>
+              </div>
+              <button 
+                onClick={() => setKonamiUnlocked(false)}
+                className="mt-8 w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white py-4 rounded-2xl font-bold shadow-xl active:scale-95 transition"
+              >
+                Close with Love 💕
+              </button>
+            </div>
           </div>
         </div>
       )}
@@ -420,7 +525,7 @@ export default function Home() {
 
           {/* Step 1: Compliments */}
           {step === 1 && (
-            <div className="space-y-6 my-10 animate-fade-in">
+            <div className="space-y-6 my-10 animate-fade-in pb-8">
               <h2 className={`text-3xl font-bold text-center mb-8 ${darkMode ? 'text-pink-200' : 'text-pink-600'}`}>
                 A few thoughts 💖
               </h2>
@@ -436,8 +541,11 @@ export default function Home() {
                 </div>
               ))}
               <button
-                onClick={() => setStep(2)}
-                className="w-full px-8 py-4 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform mt-8"
+                onClick={() => {
+                  console.log('Button clicked!');
+                  setStep(2);
+                }}
+                className="w-full px-8 py-4 bg-gradient-to-r from-pink-400 to-rose-400 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform mt-8 cursor-pointer active:scale-95"
               >
                 There's more 💖
               </button>
@@ -470,11 +578,11 @@ export default function Home() {
                 Ready? 🎂
               </button>
               <p className={`mt-6 text-xs ${darkMode ? 'text-purple-200' : 'text-gray-500'} italic`}>
-                hint try: ↑↑↓↓←→←→BA 🎮
+                Hint: Draw a secret heart pattern... Click the sparkle button to reveal hints! ✨
               </p>
             </div>
           )}
-
+          
           {/* Step 3: Photo memories */}
           {step === 3 && (
             <div className="text-center animate-fade-in">
@@ -552,14 +660,8 @@ export default function Home() {
               </div>
 
               <button
-                onClick={replayFireworks}
-                className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform flex items-center gap-2 mx-auto mb-4"
-              > see magic 💖
-              </button>
-
-              <button
                 onClick={() => setStep(0)}
-                className={`px-6 py-3 ${darkMode ? 'bg-white/10 backdrop-blur-md border border-white/20 text-pink-200' : 'bg-white/90 backdrop-blur-md text-pink-600'} rounded-full text-sm font-semibold shadow-lg hover:scale-105 transition`}
+                className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full text-lg font-semibold shadow-lg hover:shadow-xl hover:scale-105 transition transform flex items-center gap-2 mx-auto mb-4"
               >
                 Start Over 🔄
               </button>
