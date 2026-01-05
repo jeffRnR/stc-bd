@@ -28,7 +28,8 @@ export default function Home() {
   { url: '/memories/stc2.jpeg', caption: 'Beautiful soul 🌸' },
   { url: '/memories/stc1.jpeg', caption: 'Precious moments 🎀' },
   { url: '/memories/stc4.jpeg', caption: 'Magical you ✨' },
-  { url: '/memories/stc3.jpeg', caption: 'Cherished always 💝' }
+  { url: '/memories/stc3.jpeg', caption: 'Cherished always 💝' },
+  { url: '/memories/stc5.jpeg', caption: 'Fun times 🥳' }
 ];
 
 const handleBirthdayCakeClick = () => {
