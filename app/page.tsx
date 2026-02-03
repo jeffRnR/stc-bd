@@ -50,6 +50,8 @@ export default function Home() {
     { url: "/memories/stc4.jpeg", caption: "Magical you ✨" },
     { url: "/memories/stc3.jpeg", caption: "Cherished always 💝" },
     { url: "/memories/stc5.jpeg", caption: "Fun times 🥳" },
+    { url: "/memories/stc6.jpeg", caption: "Just us 🤍" },
+    { url: "/memories/stc7.jpeg", caption: "Proud of you 🌿" },
   ];
 
   const slideVariants = {
