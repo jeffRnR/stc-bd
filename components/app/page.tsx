@@ -19,11 +19,14 @@ export default function Home() {
   const audioRef = useRef<HTMLAudioElement | null>(null);
 
   const photos = [
-    { url: '/memories/stc2.jpeg', caption: 'Beautiful soul 🌸' },
-    { url: '/memories/stc1.jpeg', caption: 'Precious moments 🎀' },
-    { url: '/memories/stc4.jpeg', caption: 'Magical you ✨' },
-    { url: '/memories/stc3.jpeg', caption: 'Cherished always 💝' },
-    { url: '/memories/stc5.jpeg', caption: 'Fun times 🥳' }
+    { url: '/memories/stc2.jpeg' },
+    { url: '/memories/stc1.jpeg' },
+    { url: '/memories/stc4.jpeg' },
+    { url: '/memories/stc3.jpeg'},
+    { url: '/memories/stc5.jpeg'},
+    { url: '/memories/stc6.jpeg'},
+    { url: '/memories/stc7.jpeg'},
+    { url: '/memories/stc8.jpeg'},
   ];
 
   const compliments = [
