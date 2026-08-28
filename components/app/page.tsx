@@ -33,7 +33,8 @@ export default function Home() {
     "💕 Have the best birthday today and remember you light up every room you walk in. 💕",
     "💕 You are a queen by design, hold that crown high love 💕",
     "💕 May this year bring prosperity, wisdom, and happiness 💕",
-    "💕 Thank you for having me in your life 💕"
+    "💕 Thank you for having me in your life 💕",
+    "💕 Kiambu misses you and never stopped thinking about you 💕"
   ];
 
   // Logic Handlers
