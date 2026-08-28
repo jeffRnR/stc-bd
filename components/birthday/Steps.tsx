@@ -8,7 +8,7 @@ export const Step0_Welcome = ({ darkMode, onNext, onNameClick }: any) => (
   <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-center">
     <div className="text-8xl mb-8">🎀</div>
     <h1 onClick={onNameClick} className={`text-5xl font-bold mb-4 cursor-pointer ${darkMode ? 'text-pink-200' : 'bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent'} animate-pulse`}>Hey Stacy 💕</h1>
-    <p className={`text-xl mb-8 ${darkMode ? 'text-purple-100' : 'text-gray-700'}`}>You are loved on this side... explore something special made just for you!</p>
+    <p className={`text-xl mb-8 ${darkMode ? 'text-purple-100' : 'text-gray-700'}`}>You are loved on this side... explore something special made just for you! He misses you and thinks about even when you are continents away (especially when you are continents away)</p>
     <button onClick={onNext} className="px-8 py-4 bg-gradient-to-r from-pink-400 to-purple-400 text-white rounded-full text-lg font-semibold shadow-lg hover:scale-105 transition">Tap to start ✨</button>
   </motion.div>
 );
@@ -47,7 +47,7 @@ export const Step4_Final = ({ darkMode, onReset, onEasterEggClick, easterEggFoun
   <div className="text-center">
     <div className={`${darkMode ? 'bg-white/10' : 'bg-white'} p-8 rounded-3xl shadow-2xl mb-6`}>
       <h1 className={`text-4xl font-bold mb-6 ${darkMode ? 'text-pink-200' : 'bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent'}`}>Happy Birthday Stacy 🎉💖</h1>
-      <p className={`text-lg mb-4 ${darkMode ? 'text-purple-100' : 'text-gray-700'}`}>You light up every room you enter ✨</p>
+      <p className={`text-lg mb-4 ${darkMode ? 'text-purple-100' : 'text-gray-700'}`}>You light up every room you enter. Kiambu misses you✨</p>
       <div className="flex justify-center gap-2 text-4xl"><span className="animate-pulse">💗</span><span className="animate-pulse delay-100">💗</span><span className="animate-pulse delay-200">💗</span></div>
     </div>
     <button onClick={onReset} className="px-8 py-4 bg-gradient-to-r from-pink-500 to-purple-500 text-white rounded-full font-bold shadow-lg mb-4">Start Over</button>
