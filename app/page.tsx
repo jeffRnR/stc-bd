@@ -640,7 +640,9 @@ export default function Home() {
                   darkMode ? "text-purple-100" : "text-gray-700"
                 } mb-8`}
               >
-                You are loved on this side... explore something special made
+                You are loved on this side... in case of the rare occassion that you find yourself here please know that you are incredibly missed from 
+                miles away. The author is sorry for how things turned out in the end and wish you find it in you to forgive them... 
+                explore something special made
                 just for you! (because you are special 😊)
               </p>
               <button
